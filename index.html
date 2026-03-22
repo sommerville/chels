@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#e3000f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HoodiePup">
+<meta name="description" content="Your favorite hoodie-wearing pup">
+
+<title>Hoodie Pup</title>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Icons -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --red: #e3000f;
+  --red-dark: #a80009;
+  --red-glow: rgba(227,0,15,0.4);
+  --black: #0a0a0a;
+  --off-black: #141414;
+  --card: #1a1a1a;
+  --white: #fff;
+  --warm: #fdf3e3;
+  --gold: #f0b429;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── Background radial glow ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(227,0,15,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 50% 100%, rgba(227,0,15,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ── */
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: env(safe-area-inset-top, 0) 20px env(safe-area-inset-bottom, 20px);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  margin-bottom: 8px;
+  animation: fadeDown 0.6s ease both;
+}
+.header-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 8px;
+}
+.header h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(42px, 12vw, 64px);
+  line-height: 1;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #fff 0%, #ffd6d6 60%, var(--red) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px var(--red-glow));
+}
+.header p {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  margin-top: 8px;
+}
+
+/* ── Dog illustration ── */
+.dog-wrap {
+  position: relative;
+  width: min(320px, 80vw);
+  margin: 16px 0;
+  animation: popIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+.dog-wrap::before {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 40px;
+  background: radial-gradient(ellipse, rgba(227,0,15,0.35) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.dog-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 40px rgba(227,0,15,0.3));
+  animation: float 3.5s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ── Status card ── */
+.status-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 20px 24px;
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s ease 0.4s both;
+}
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #3ddc84;
+  box-shadow: 0 0 8px #3ddc84;
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 8px #3ddc84; }
+  50% { box-shadow: 0 0 16px #3ddc84, 0 0 4px #3ddc84; }
+}
+.status-text { font-size: 14px; font-weight: 700; color: var(--white); }
+.status-sub  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.status-badge {
+  margin-left: auto;
+  background: rgba(61,220,132,0.15);
+  color: #3ddc84;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(61,220,132,0.3);
+}
+
+/* ── Install banner ── */
+.install-banner {
+  display: none;
+  background: linear-gradient(135deg, var(--red-dark), var(--red));
+  border-radius: 20px;
+  padding: 20px 24px;
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.4s ease both;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.install-banner::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 100px; height: 100px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.install-banner.visible { display: block; }
+.install-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.install-icon { font-size: 28px; }
+.install-title { font-family: 'Fredoka One', cursive; font-size: 18px; }
+.install-desc  { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+.install-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 12px;
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s;
+  letter-spacing: 0.3px;
+}
+.install-btn:active { background: rgba(255,255,255,0.3); }
+
+/* ── Facts carousel ── */
+.facts-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 20px 24px;
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s ease 0.5s both;
+}
+.facts-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 10px;
+}
+.fact-text {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.85);
+  min-height: 48px;
+  transition: opacity 0.3s;
+}
+.fact-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+.fact-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.3s;
+}
+.fact-dot.active { background: var(--red); }
+
+/* ── Woof button ── */
+.woof-btn {
+  width: 100%;
+  max-width: 360px;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  border: none;
+  border-radius: 18px;
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 8px 32px var(--red-glow);
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: fadeUp 0.6s ease 0.6s both;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.woof-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.woof-btn:active { transform: scale(0.96); box-shadow: 0 4px 16px var(--red-glow); }
+
+/* ── Woof ripple ── */
+.ripple {
+  position: fixed;
+  border-radius: 50%;
+  background: rgba(227,0,15,0.3);
+  transform: scale(0);
+  animation: ripple-expand 0.6s ease-out forwards;
+  pointer-events: none;
+  z-index: 999;
+}
+@keyframes ripple-expand {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ── Footer ── */
+.footer {
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+  margin-top: auto;
+  padding-top: 16px;
+  animation: fadeUp 0.6s ease 0.8s both;
+}
+
+/* ── Keyframes ── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Offline pill ── */
+.offline-pill {
+  display: none;
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 30px;
+  z-index: 1000;
+  white-space: nowrap;
+}
+.offline-pill.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="header-eyebrow">🐾 est. today</div>
+    <h1>Hoodie Pup</h1>
+    <p>The goodest boy on your home screen</p>
+  </div>
+
+  <div class="dog-wrap">
+    <img class="dog-img" src="icon-512x512.png" alt="Hoodie Pup mascot">
+  </div>
+
+  <!-- Install banner (shown when installable) -->
+  <div class="install-banner" id="installBanner">
+    <div class="install-top">
+      <div class="install-icon">📲</div>
+      <div>
+        <div class="install-title">Add to Home Screen</div>
+        <div class="install-desc">Install for offline access & full-screen</div>
+      </div>
+    </div>
+    <button class="install-btn" id="installBtn">Install Hoodie Pup — It's Free! 🐶</button>
+  </div>
+
+  <!-- PWA status -->
+  <div class="status-card">
+    <div class="status-row">
+      <div class="status-dot"></div>
+      <div>
+        <div class="status-text" id="statusText">PWA Ready</div>
+        <div class="status-sub" id="statusSub">Service worker active · Works offline</div>
+      </div>
+      <div class="status-badge" id="statusBadge">LIVE</div>
+    </div>
+  </div>
+
+  <!-- Dog facts -->
+  <div class="facts-card">
+    <div class="facts-label">🐕 Did You Know?</div>
+    <div class="fact-text" id="factText">Loading a pup fact...</div>
+    <div class="fact-dots" id="factDots"></div>
+  </div>
+
+  <!-- Woof button -->
+  <button class="woof-btn" id="woofBtn" onclick="woof(event)">
+    🐾 Say Woof!
+  </button>
+
+  <div class="footer">
+    Hoodie Pup PWA · Made with ❤️ · Works offline
+  </div>
+
+</div>
+
+<div class="offline-pill" id="offlinePill">📡 You're offline — but the pup is here!</div>
+
+<script>
+// ── Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        console.log('[SW] Registered:', reg.scope);
+        document.getElementById('statusText').textContent = 'PWA Active';
+        document.getElementById('statusSub').textContent  = 'Offline-ready · Cached · Installable';
+      })
+      .catch(err => {
+        console.warn('[SW] Failed:', err);
+        document.getElementById('statusText').textContent = 'PWA (no SW)';
+        document.getElementById('statusSub').textContent  = 'Service worker unavailable';
+      });
+  });
+}
+
+// ── Install Prompt ──
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('visible');
+});
+
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  console.log('[PWA] Install outcome:', outcome);
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('visible');
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('visible');
+  document.getElementById('statusText').textContent = '🎉 Installed!';
+  document.getElementById('statusSub').textContent  = 'Running as standalone app';
+  document.getElementById('statusBadge').textContent = 'APP';
+});
+
+// ── Offline detection ──
+function updateOnlineStatus() {
+  const pill = document.getElementById('offlinePill');
+  if (!navigator.onLine) {
+    pill.classList.add('show');
+  } else {
+    pill.classList.remove('show');
+  }
+}
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ── Dog Facts ──
+const facts = [
+  "Dogs have a sense of smell 10,000–100,000 times more powerful than humans. 👃",
+  "A dog's nose print is as unique as a human fingerprint. 🐽",
+  "Dogs can recognize over 150 words and count up to 4 or 5. 🧠",
+  "Puppies are born blind, deaf, and toothless. They're basically tiny blobs of love. 🍬",
+  "Dogs curl up in a ball when sleeping to protect vital organs — an ancient instinct. 🌀",
+  "The Basenji is the only dog breed that can't bark — it yodels instead. 🎵",
+  "A dog's sense of hearing is 4× more sensitive than a human's. 👂",
+  "Dogs dream just like humans — REM sleep and all. What do they dream about? You. 💭",
+  "Greyhounds can reach 45 mph — faster than some cars in a school zone. 🏎️",
+  "Dogs have three eyelids, including a protective inner lid called the haw. 👁️"
+];
+
+let factIndex = 0;
+const factEl   = document.getElementById('factText');
+const dotsEl   = document.getElementById('factDots');
+
+function buildDots() {
+  dotsEl.innerHTML = facts.map((_, i) =>
+    `<div class="fact-dot ${i === factIndex ? 'active' : ''}" onclick="goToFact(${i})"></div>`
+  ).join('');
+}
+
+function goToFact(i) {
+  factIndex = i;
+  factEl.style.opacity = '0';
+  setTimeout(() => {
+    factEl.textContent = facts[factIndex];
+    factEl.style.opacity = '1';
+    buildDots();
+  }, 200);
+}
+
+// Init
+factEl.textContent = facts[factIndex];
+buildDots();
+
+// Auto-advance every 5s
+setInterval(() => {
+  factIndex = (factIndex + 1) % facts.length;
+  goToFact(factIndex);
+}, 5000);
+
+// ── Woof! ──
+const woofSounds = ['Woof! 🐶', 'Bork! 🐾', 'Arf arf! 🦴', 'Woooof! 😄', 'Bork bork! 🐕'];
+let woofIdx = 0;
+
+function woof(e) {
+  const btn = document.getElementById('woofBtn');
+  btn.textContent = '🐾 ' + woofSounds[woofIdx % woofSounds.length] + ' 🐾';
+  woofIdx++;
+
+  // Ripple effect
+  const ripple = document.createElement('div');
+  ripple.className = 'ripple';
+  const size = Math.max(window.innerWidth, window.innerHeight) * 0.5;
+  ripple.style.cssText = `
+    width: ${size}px;
+    height: ${size}px;
+    top: ${e.clientY - size/2}px;
+    left: ${e.clientX - size/2}px;
+  `;
+  document.body.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 700);
+
+  setTimeout(() => {
+    btn.textContent = '🐾 Say Woof!';
+  }, 1500);
+}
+</script>
+</body>
+</html>
