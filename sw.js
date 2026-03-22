@@ -1,5 +1,5 @@
 // sw.js — Service Worker for Hoodie Pup PWA
-const CACHE_NAME = 'hoodie-pup-v1';
+const CACHE_NAME = 'hoodie-pup-v16';
 
 const PRECACHE_ASSETS = [
   '/index.html',
